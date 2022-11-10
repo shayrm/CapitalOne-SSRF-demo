@@ -76,6 +76,6 @@ For a SSRF to succeed with this update, the attacker would need to be able to co
   Although this will not completely mitigate this exploit, ensuring that IAM policies are designed with least privilege principles in mind will lower an attackers ability to move laterally in the event that an ec2 instance is compromised.
 
 ## Let's GO - execute the demo
-With the help of a predefined web server, it is possible to run the SSRF attack.
+With the help of a predefined web server, it is possible to run the SSRF attack.  
 Credit to [SethSec](https://github.com/sethsec) for the [vulnerable application](https://github.com/sethsec/Nodejs-SSRF-App)
 You can start the implementing the demo environment following the [demo instructions](Demo-instructions/README.md)
