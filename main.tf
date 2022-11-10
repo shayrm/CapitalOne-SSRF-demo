@@ -177,14 +177,6 @@ resource "aws_security_group_rule" "ssh" {
 #############################
 # VMs
 #############################
-#data "aws_ami" "ubuntu_focal" {
-#  owners      = ["099720109477"] ### will need to check if this is needed or not.
-#  most_recent = true
-#  filter {
-#    name   = "name"
-#    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-#  }
-#}
 
 resource "aws_instance" "web-server" {
   ami                         = var.ubuntu-ami
@@ -217,21 +209,13 @@ resource "aws_instance" "web-server" {
 resource "aws_s3_bucket" "c-one-demo" {
   bucket = var.bucket_name
   force_destroy = true
-
-  #server_side_encryption_configuration {
-  #  rule {
-  #    apply_server_side_encryption_by_default {
-  #      sse_algorithm = "AES256"
-  #    }
-  #  }
-  #}
-}
+ 
 resource "aws_s3_bucket_acl" "c-one-demo_bucket_acl" {
     bucket = aws_s3_bucket.c-one-demo.id
     acl    = "private"
 }
 
-# Upload an 
+# Upload the top_secret_file.csv file to S3
 resource "aws_s3_object" "object" {
 
   bucket = aws_s3_bucket.c-one-demo.id
@@ -241,7 +225,6 @@ resource "aws_s3_object" "object" {
   etag = filemd5("top_secret_file.csv") 
 }
 
-### Find how it is possible to copy file to the bucket or I could do it manually. 
 
 #############################
 # Outputs
