@@ -77,5 +77,5 @@ For a SSRF to succeed with this update, the attacker would need to be able to co
 
 ## Let's GO - execute the demo
 With the help of a predefined web server, it is possible to run the SSRF attack.  
-Credit to [SethSec](https://github.com/sethsec) for the [vulnerable application](https://github.com/sethsec/Nodejs-SSRF-App)
+Credit to [SethSec](https://github.com/sethsec) for the [vulnerable application](https://github.com/sethsec/Nodejs-SSRF-App)  
 You can start the implementing the demo environment following the [demo instructions](Demo-instructions/README.md)
