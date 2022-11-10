@@ -1,7 +1,7 @@
 # Capital-One Breach Demo
 
-<i> This is a repo designed to walk users through the infamous Capital-One breach, and exploitation of a vulnerable ec2 instance via the AWS IMDSv1 SSRF exploit.
-The repo include the description of the breach and a terraform file to create the infrastructure in AWS to recreate the vulnerability </i>
+<i> This repo designed to walk users through the infamous Capital-One breach, and exploitation of a vulnerable ec2 instance via the AWS IMDSv1 SSRF exploit.
+The repo includes the description of the breach and a Terraform file to create the infrastructure in AWS</i>
 
 ## Objectives
 - Review Capital-One breach and its implication.
