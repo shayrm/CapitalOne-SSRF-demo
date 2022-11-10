@@ -4,7 +4,7 @@ The terraform file attached will help to create the required resources, AWS serv
 it is possible to `destroy` the stack when done and the created resources will be deleted</i>  
 
 ## Prerequisites  
-- Modify or change inputs in the `main.tf` file with the relevant region, key_pairs, instance_profile
+- Modify or change inputs in the [main.tf](../main.tf) file with the relevant region, key_pairs, instance_profile
 - Validate the `main.tf` file and check that the `terraform fmt, validate, plan` command has no errors.
 - The script will create a new S3 bucket named `c-one-demo` and upload a "secret" file
 
