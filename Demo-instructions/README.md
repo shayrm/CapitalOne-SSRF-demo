@@ -113,4 +113,8 @@ At this point, webserver should not return any data for given urls, given the in
   ```
 
 ## References:
+1. https://blog.lightspin.io/tag/cloud-security
+2. https://blog.appsecco.com/server-side-request-forgery-ssrf-and-aws-ec2-instances-after-instance-meta-data-service-version-38fc1ba1a28a
+3. https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules-25526d65f73d
+4. https://www.youtube.com/watch?v=tPQsI8n6er0
 
