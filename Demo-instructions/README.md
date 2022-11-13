@@ -77,7 +77,7 @@ it is possible to `destroy` the stack when done and the created resources will b
 
    Run the below command, substituting {bucket_name} for the name of the ec2-metadata bucket returned in the previous step.
    ```
-   $ aws s3 ls {bucket_name} --profile ssrf-demo
+   $ aws s3 ls {bucket_name} --profile c-demo
    ```  
    There's another object in here, our `top_secret_file`  
    As an attacker, we might want to download this file. This process is called data exfiltration.
