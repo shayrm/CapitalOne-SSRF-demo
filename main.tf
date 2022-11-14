@@ -14,7 +14,7 @@ variable "profile" {
 }
 
 variable "ubuntu-ami" {
-    default = "ami-0fd8802f94ed1c969"
+  default = "ami-0fd8802f94ed1c969"
 }
 
 variable "instance_type" {
@@ -22,12 +22,16 @@ variable "instance_type" {
 }
 
 variable "instance_profile" {
-  default = "ec2-role-c-demo"
-  
+  default = "c-demo-role"
+}
+
+variable "instance_policy" {
+  default = "c-demo-policy"
+
 }
 
 variable "base_name" {
-  default = "c-one-demo"
+  default = "c-one-ssrf"
 }
 
 variable "bucket_name" {
@@ -35,7 +39,7 @@ variable "bucket_name" {
 }
 
 variable "key_pair" {
-  default = "c-one-demo"
+  default = "shay-key"
 }
 
 #############################
@@ -82,7 +86,7 @@ terraform {
   }
 
   required_version = ">= 1.2.0"
-  
+
 }
 
 provider "aws" {
@@ -174,14 +178,66 @@ resource "aws_security_group_rule" "ssh" {
   security_group_id = aws_security_group.sg1.id
 }
 
-#############################
+#####################################
+# Policy Roles and Instance Policy
+#####################################
+resource "aws_iam_policy" "demo-policy" {
+  name        = var.instance_policy
+  path        = "/"
+  description = "c-demo policy"
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:*",
+            "s3-object-lambda:*"
+          ],
+          "Resource" : "*"
+        }
+      ]
+  })
+}
+
+resource "aws_iam_role" "demo-role" {
+  name               = var.instance_profile
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+
+  tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "demo-attach" {
+  role       = aws_iam_role.demo-role.name
+  policy_arn = aws_iam_policy.demo-policy.arn
+}
+
+resource "aws_iam_instance_profile" "demo-profile" {
+  name = var.instance_profile
+  role = aws_iam_role.demo-role.name
+}
+#
+##############################
 # VMs
 #############################
 
 resource "aws_instance" "web-server" {
-  ami                         = var.ubuntu-ami
-  instance_type               = var.instance_type
-  #ebs_optimized               = true
+  ami           = var.ubuntu-ami
+  instance_type = var.instance_type
   availability_zone           = data.aws_availability_zones.available.names[0]
   iam_instance_profile        = var.instance_profile
   subnet_id                   = aws_subnet.subnet1.id
@@ -207,24 +263,22 @@ resource "aws_instance" "web-server" {
 # Buckets
 #############################
 resource "aws_s3_bucket" "c-one-demo" {
-  bucket = var.bucket_name
+  bucket        = var.bucket_name
   force_destroy = true
- 
-resource "aws_s3_bucket_acl" "c-one-demo_bucket_acl" {
-    bucket = aws_s3_bucket.c-one-demo.id
-    acl    = "private"
 }
 
-# Upload the top_secret_file.csv file to S3
-resource "aws_s3_object" "object" {
+resource "aws_s3_bucket_acl" "acl" {
+  bucket = aws_s3_bucket.c-one-demo.id
+  acl    = "private"
+}
 
+# Upload the secret file
+resource "aws_s3_object" "object" {
   bucket = aws_s3_bucket.c-one-demo.id
   key    = "top_secret_file"
-  #acl    = aws_s3_bucket_acl.c-one-demo_bucket_acl  # or can be "public-read"
   source = "top_secret_file.csv"
-  etag = filemd5("top_secret_file.csv") 
+  etag   = filemd5("top_secret_file.csv")
 }
-
 
 #############################
 # Outputs
